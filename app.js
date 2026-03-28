@@ -256,6 +256,17 @@ app.get('/api/info', (req, res) => {
   });
 });
 
+// Manejador de errores global para evitar respuestas de texto plano
+app.use((err, req, res, next) => {
+  console.error('[GLOBAL ERROR]:', err);
+  res.status(500).json({
+    success: false,
+    error: 'Error interno del servidor',
+    message: err.message,
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack
+  });
+});
+
 const PORT = process.env.PORT || 3001;
 const HOST = '0.0.0.0';
 
