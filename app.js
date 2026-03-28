@@ -122,17 +122,13 @@ app.post('/api/process', upload.single('fingerprint'), async (req, res) => {
     // Mejorar
     const enhanced = await enhanceFingerprintTexture(req.file.buffer, mode, null);
     
-    // Guardar resultado
-    const filename = `fingerprint-${Date.now()}.png`;
-    const filepath = path.join(resultsDir, filename);
-    await sharp(enhanced).toFile(filepath);
-    
-    console.log(`[PROCESS] Saved processed image: ${filename}`);
+    // En Vercel no podemos escribir archivos persistentes, devolvemos la imagen en Base64
+    const base64Image = (await sharp(enhanced).toBuffer()).toString('base64');
     
     res.json({
       success: true,
       analysis,
-      processedImage: `/results/${filename}`,
+      processedImage: `data:image/png;base64,${base64Image}`,
       processingMode: mode,
       timestamp: new Date().toISOString()
     });
@@ -166,17 +162,13 @@ app.post('/api/process-advanced', upload.single('fingerprint'), async (req, res)
     // Mejorar con prompt personalizado
     const enhanced = await enhanceFingerprintTexture(req.file.buffer, mode, customPrompt);
     
-    // Guardar resultado
-    const filename = `fingerprint-${Date.now()}.png`;
-    const filepath = path.join(resultsDir, filename);
-    await sharp(enhanced).toFile(filepath);
-    
-    console.log(`[PROCESS-ADVANCED] Saved processed image: ${filename}`);
+    // En Vercel no podemos escribir archivos persistentes, devolvemos la imagen en Base64
+    const base64Image = (await sharp(enhanced).toBuffer()).toString('base64');
     
     res.json({
       success: true,
       analysis,
-      processedImage: `/results/${filename}`,
+      processedImage: `data:image/png;base64,${base64Image}`,
       processingMode: mode,
       customPrompt: customPrompt || null,
       timestamp: new Date().toISOString()
